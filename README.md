@@ -83,11 +83,11 @@ Dự án được thực hiện theo các giai đoạn chính sau:
 
 Dự án này được thực hiện bởi Group 1 thuộc lớp J1.2502.E1, dưới sự hướng dẫn của Giáo viên NGUYỄN PHÁT TÀI.
 
-* Lê Sỹ Hoàng Minh (JK-ENR-HA-11705)
-* Tiết Vinh Phú (JK-ENR-HA-11707)
-* Trần Mãnh Phát (JK-ENR-HA-11744)
-* Lê Minh Phương (JK-ERN-HA-11700)
-* Tạ Anh Tuấn (JK-ERN-HA-11749)
+* Lê Sỹ Hoàng Minh
+* Tiết Vinh Phú
+* Trần Mãnh Phát
+* Lê Minh Phương
+* Tạ Anh Tuấn
 
 ## Đóng góp
 
