@@ -79,16 +79,6 @@ Dự án được thực hiện theo các giai đoạn chính sau:
 7.  **Tài liệu hóa:**
     * Ghi lại chi tiết cấu hình, sơ đồ và quy trình triển khai để hỗ trợ bảo trì và phát triển trong tương lai.
 
-## Thành viên Nhóm
-
-Dự án này được thực hiện bởi Group 1 thuộc lớp J1.2502.E1, dưới sự hướng dẫn của Giáo viên NGUYỄN PHÁT TÀI.
-
-* Lê Sỹ Hoàng Minh
-* Tiết Vinh Phú
-* Trần Mãnh Phát
-* Lê Minh Phương
-* Tạ Anh Tuấn
-
 ## Đóng góp
 
 Mọi đóng góp cho dự án này đều được hoan nghênh. Vui lòng tạo một Pull Request hoặc mở một Issue nếu bạn có bất kỳ đề xuất hoặc phát hiện lỗi nào.
