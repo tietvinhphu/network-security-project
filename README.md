@@ -85,6 +85,5 @@ Mọi đóng góp cho dự án này đều được hoan nghênh. Vui lòng tạ
 
 ## Video Dự án
 Bạn có thể xem các video dự án của mình tại đây: <br>
-https://youtube.com/playlist?list=PL8Q9o0_e7O9J0CwLQAX461xbGtEV9lKE1&si=ZgIEgWzmTCCGPWo8
-
+[Video Dự án An ninh Mạng](https://youtube.com/playlist?list=PL8Q9o0_e7O9J0CwLQAX461xbGtEV9lKE1&si=ZgIEgWzmTCCGPWo8)
 ---
