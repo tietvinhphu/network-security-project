@@ -83,8 +83,4 @@ Dự án được thực hiện theo các giai đoạn chính sau:
 
 Mọi đóng góp cho dự án này đều được hoan nghênh. Vui lòng tạo một Pull Request hoặc mở một Issue nếu bạn có bất kỳ đề xuất hoặc phát hiện lỗi nào.
 
-## Giấy phép
-
-[Nếu dự án của bạn có giấy phép cụ thể (ví dụ: MIT, Apache 2.0, GPL), hãy thêm thông tin giấy phép tại đây. Nếu không, bạn có thể xóa phần này.]
-
 ---
