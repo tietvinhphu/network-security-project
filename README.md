@@ -83,7 +83,8 @@ Dự án được thực hiện theo các giai đoạn chính sau:
 
 Mọi đóng góp cho dự án này đều được hoan nghênh. Vui lòng tạo một Pull Request hoặc mở một Issue nếu bạn có bất kỳ đề xuất hoặc phát hiện lỗi nào.
 
-## Video Demo Dự án
-Bạn có thể xem video demo dự án của chúng tôi tại đây: <br>
-https://www.youtube.com/watch?v=X2yUj7eWrxE
+## Video Dự án
+Bạn có thể xem các video dự án của mình tại đây: <br>
+https://youtube.com/playlist?list=PL8Q9o0_e7O9J0CwLQAX461xbGtEV9lKE1&si=ZgIEgWzmTCCGPWo8
+
 ---
