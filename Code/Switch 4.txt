@@ -1,0 +1,55 @@
+Cấu hình Switch 4
+------------------
+1/Cấu hình cơ bản
+
+enable
+configure terminal
+banner motd ^
++===========================+
+|  FPT JETKING - PENTAGUARD |
++===========================+
+^
+hostname SW4
+no cdp run
+no ip domain-lookup
+line console 0
+logging synchronous
+exit
+
+#--- Tạo vlan quản trị
+
+vlan 100
+name MGMT
+interface e1/0
+sw mode acc
+sw acc vlan 100
+int vlan 100
+ip address 192.168.100.130 255.255.255.0
+no shutdown
+end
+copy run start
+------------------
+2.Cấu hình SSH &  tạo ACL cho phép MGMT - SSH
+
+ena
+conf t
+
+service password-encryption
+enable secret @Penta123
+ip domain-name pentaguard.local
+username admin privilege 15 secret @Penta123
+crypto key generate rsa
+1024
+ip ssh version 2
+
+ip access-list standard VTY_SSH_FROM_MGMT_ONLY
+permit host 192.168.100.8 log
+deny any log
+exit
+line vty 0 4
+access-class VTY_SSH_FROM_MGMT_ONLY in
+transport input ssh
+login local
+end
+copy run start
+------------------

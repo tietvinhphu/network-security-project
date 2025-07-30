@@ -1,0 +1,486 @@
+#Fortinet 1
+config system interface
+    edit "port1"
+        set mode static
+        set ip 192.168.65.10/24
+        set allowaccess ping https http ssh
+        set vdom root
+        set role wan
+        set alias "FPT"
+    next
+    edit "port2"
+        set ip 103.119.85.10/24
+        set allowaccess ping ssh
+        set role wan
+        set alias "Viettel"
+    next
+    edit port3
+        set ip 10.1.2.1/28
+        set allowaccess ping
+        set role lan
+        set alias "Lan-Port"
+    next
+    edit port4
+        set ip 10.1.3.1/28
+        set allowaccess ping
+        set role lan
+        set alias "Lan-Port"
+    next
+    edit "port7"
+        set ip 10.0.0.1/24
+        set alias "DMZ"
+        set role dmz
+        set allowaccess ping ssh
+    next
+    edit "port8"
+        set ip 192.168.120.1/24
+        set alias "ServerFarm"
+        set allowaccess ping ssh
+    next
+end
+
+#Sau khi assign port10 vao Management interface reservation
+config system interface
+    edit "port10"
+        set ip 192.168.100.240/24
+        set alias "MGMT"
+        set allowaccess ssh ping
+    next
+end
+
+#Fortinet 2
+config system interface
+    edit "port1"
+        set mode static
+        set ip 192.168.65.20/24
+        set allowaccess ping http https ssh
+        set role wan
+        set alias FPT
+    next
+    edit "port2"
+        set ip 103.119.85.20/24
+        set allowaccess ping ssh
+        set role wan
+        set alias Viettel
+    next
+    edit port3
+        set ip 10.1.2.2/28
+        set allowaccess ping
+        set role lan
+        set alias "Lan-Port"
+    next
+    edit port4
+        set ip 10.1.3.2/28
+        set allowaccess ping
+        set role lan
+        set alias "Lan-Port"
+    next
+    edit "port7"
+        set ip 10.0.0.2/24
+        set alias "DMZ"
+        set role dmz
+        set allowaccess ssh ping
+    next
+    edit "port8"
+        set ip 192.168.120.2/24
+        set alias "ServerFarm"
+        set allowaccess ssh ping
+    next
+end
+
+#Cau hinh zone Firewall 1
+config system zone
+    edit "LAN-ZONE"
+        set interface "port3" "port4"
+    next
+    edit "WAN-ZONE"
+        set interface "port1" "port2"
+    next
+    edit "DMZ-ZONE"
+        set interface "port7"
+    next
+    edit "SERVERFARM-ZONE"
+        set interface "port8"
+    next
+end
+
+#Cau hinh zone Firewall 2
+config system zone
+    edit "LAN-ZONE"
+        set interface "port3" "port4"
+    next
+    edit "WAN-ZONE"
+        set interface "port1" "port2"
+    next
+    edit "DMZ-ZONE"
+        set interface "port7"
+    next
+    edit "SERVERFARM-ZONE"
+        set interface "port8"
+    next
+end
+
+#Tao dai address Firewall 1 va 2
+config firewall address
+  edit "VLAN-10"
+    set subnet 192.168.10.0 255.255.255.0
+    set comment "VLAN 10 Subnet for internal users"
+  next
+  edit "VLAN-20"
+    set subnet 192.168.20.0 255.255.255.0
+    set comment "VLAN 20 Subnet for internal users"
+  next
+  edit "VLAN-30"
+    set subnet 192.168.30.0 255.255.255.0
+    set comment "VLAN 30 Subnet for internal users"
+  next
+  edit "VLAN-40"
+    set subnet 192.168.40.0 255.255.255.0
+    set comment "VLAN 40 Subnet for internal users"
+  next
+  edit "VLAN-90"
+    set subnet 192.168.90.0 255.255.255.0
+    set comment "VLAN 90 Subnet for internal users"
+  next
+  edit "VLAN-99"
+    set subnet 192.168.99.0 255.255.255.0
+    set comment "VLAN 99 Subnet for internal users"
+  next
+  edit "VLAN-110"
+    set subnet 192.168.110.0 255.255.255.0
+    set comment "VLAN 110 Subnet for internal users"
+  next
+end
+
+#Tao group address 
+config firewall addrgrp
+   edit "LAN-GROUP"
+   set member "VLAN-10" "VLAN-20" "VLAN-30" "VLAN-40" "VLAN-90" "VLAN-99" "VLAN-110"
+   set comment "Internal Vlan group"
+  next
+end
+
+
+#Tao policy Lan to Internet Firewall 1
+config firewall policy
+    edit 1
+        set name "LAN-to-Internet"
+        set srcintf "LAN-ZONE"
+        set dstintf "WAN-ZONE"
+        set srcaddr "LAN-GROUP"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+    next
+end
+
+#Tao policy Lan to Internet Firewall 2
+config firewall policy
+    edit 1
+        set name "LAN-to-Internet"
+        set srcintf "LAN-ZONE"
+        set dstintf "WAN-ZONE"
+        set srcaddr "LAN-GROUP"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+    next
+end
+
+
+Firewall 1
+#Cau hinh HA - active 
+config system ha
+    set group-name "FG-Cluster"
+    set mode a-p
+    set password @Penta123
+    set hbdev port5 100 port6 200
+    set override enable
+    set priority 200
+    set session-pickup enable
+    set session-pickup-connection enable
+    set monitor "port1" "port2" "port3" "port4"
+end
+
+
+
+Firewall 2
+#Cau hinh HA - active
+config system ha
+    set group-name "FG-Cluster"
+    set mode a-p
+    set password @Penta123
+    set hbdev port5 100 port6 200
+    set override enable
+    set priority 100
+    set session-pickup enable
+    set session-pickup-connection enable
+    set monitor "port1" "port2" "port3" "port4"
+end
+
+
+no ip route 0.0.0.0 0.0.0.0 10.1.3.1
+ip route 0.0.0.0 0.0.0.0 10.1.3.1 track 1
+ip route 0.0.0.0 0.0.0.0 10.1.2.1 10
+
+#Chi cho switch ping
+config firewall address
+    edit "CoreSwitch-sub1"
+        set subnet 10.1.2.0 255.255.255.0
+    next
+    edit "CoreSwitch-sub2"
+        set subnet 10.1.3.0 255.255.255.0
+    next
+end
+
+
+config firewall local-in-policy
+    edit 4
+        set intf "LAN-ZONE"
+        set srcaddr "CoreSwitch-sub1"
+        set dstaddr "all"
+        set service "PING"
+        set action accept
+        set schedule "always"
+    next
+    edit 5
+        set intf "LAN-ZONE"
+        set srcaddr "CoreSwitch-sub2"
+        set dstaddr "all"
+        set service "PING"
+        set action accept
+        set schedule "always"
+    next
+    edit 6
+        set intf "LAN-ZONE"
+        set srcaddr "all"
+        set dstaddr "all"
+        set service "PING"
+        set action deny
+        set schedule "always"
+    next
+end
+
+
+
+#show route table
+get router info routing-table all
+
+# Kiểm tra cấu hình đã sync hay chưa:
+diagnose sys ha checksum show
+
+# Kiểm tra cấu hình route đã được sync (trong config)
+show router static
+
+#NAT Inbound
+# VIP: NAT tới Web Server (10.0.0.20), chuyển port 9969 → 80
+config firewall vip
+    edit "NAT-TO-WEBSERVER"
+        set comment "NAT from 192.168.65.10:6969 to Web Server 10.0.0.20:80"
+        set extip 192.168.65.10
+        set extintf "WAN-ZONE"
+        set portforward enable
+        set mappedip "10.0.0.20"
+        set extport 9969
+        set mappedport 80
+        set protocol tcp
+    next
+
+# VIP: NAT tới Monitor (192.168.120.30), chuyển port 6999 → 3389
+    edit "NAT-TO-MONITOR"
+        set comment "NAT from 192.168.65.10:6999 to Monitor 192.168.120.30:3389"
+        set extip 192.168.65.10
+        set extintf "WAN-ZONE"
+        set portforward enable
+        set mappedip "192.168.120.30"
+        set extport 6999
+        set mappedport 3389
+        set protocol tcp
+    next
+
+# VIP: NAT tới Domain Controller (192.168.120.20), chuyển port 9696 → 9996
+    edit "NAT-TO-DC"
+        set comment "NAT from 192.168.65.10:9696 to DC 192.168.120.20:9996"
+        set extip 192.168.65.10
+        set extintf "WAN-ZONE"
+        set portforward enable
+        set mappedip "192.168.120.20"
+        set extport 9696
+        set mappedport 9996
+        set protocol tcp
+    next
+end
+
+#Tao Group nat
+config firewall vipgrp
+    edit "NAT-GROUP"
+        set comment "group VIP for external services"
+        set interface "port1"
+        set member "NAT-TO-WEBSERVER" "NAT-TO-MONITOR" "NAT-TO-DC"
+    next
+end
+
+
+#Tao Policy cho Service
+config firewall policy
+
+    # Web Server (Port 9969 → 10.0.0.20:80)
+   edit 10
+        set name "INBOUND-WEBSERVER"
+        set srcintf WAN-ZONE
+        set dstintf DMZ-ZONE  
+        set srcaddr "all"
+        set dstaddr "NAT-TO-WEBSERVER"
+        set action accept
+        set schedule "always"
+        set service ALL
+        set nat disable
+    next
+
+    # Monitor Server (Port 6999 → 192.168.120.30:3389)
+    edit 11
+        set name "INBOUND-MONITOR"
+        set srcintf WAN-ZONE
+        set dstintf SERVERFARM-ZONE       
+        set srcaddr "all"
+        set dstaddr "NAT-TO-MONITOR"
+        set action accept
+        set schedule "always"
+        set service ALL
+        set nat disable
+    next
+
+    # Domain Controller (Port 9696 → 192.168.120.20:9996)
+    edit 12
+        set name "INBOUND-DC"
+        set srcintf WAN-ZONE
+        set dstintf SERVERFARM-ZONE
+        set srcaddr "all"
+        set dstaddr "NAT-TO-DC"
+        set action accept
+        set schedule "always"
+        set service ALL
+        set nat disable
+    next
+
+end
+
+#Tao DMZ address
+config firewall address
+    edit "DMZ_SUBNET"
+        set subnet 10.0.0.0 255.255.255.0
+        set comment "Subnet DMZ for web servers"
+    next
+end
+
+#Tao outbound cho dmz
+config firewall policy
+    edit 2
+        set name "OUTBOUND-WEBSERVER"
+        set srcintf "DMZ-ZONE"
+        set dstintf "WAN-ZONE"
+        set srcaddr "DMZ_SUBNET"   
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat disable
+    next
+end
+
+#Tao SVFRAM address
+config firewall address
+    edit "SVFARM_SUBNET"
+        set subnet 192.168.120.0 255.255.255.0
+        set comment "Subnet FARM SERVER"
+    next
+end
+
+#Tao policy cho monitor
+config firewall policy
+    edit 3
+        set name "OUTBOUND-FARMSERVER"
+        set srcintf "SERVERFARM-ZONE"
+        set dstintf "WAN-ZONE"
+        set srcaddr "SVFARM_SUBNET"   
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat disable
+    next
+end
+
+
+#Log firewall
+config log syslogd setting
+    set status enable
+    set server "192.168.120.30"
+    set port 514
+    set facility local7
+    set format default
+end
+
+#Filter Log firewall (Hướng phát triển - hiện tại chưa cấu hình vì cần test)
+config log syslogd filter
+    set severity information
+    set forward-traffic enable
+    set local-traffic enable
+    set voip enable
+    set multicast-traffic enable
+end
+
+#ACL chan truy cap local tu Internet
+config firewall addrgrp
+    edit "INTERNAL_SUBNETS"
+        set member "VLAN-10" "VLAN-20" "VLAN-30" "VLAN-40" "VLAN-90" "VLAN-99" "VLAN-110"
+        set comment "All private/internal subnets to deny direct access from WAN"
+    next
+end
+
+config firewall policy
+    edit 4
+        set name "Deny_Direct_To_Private"
+        set srcintf "WAN-ZONE"  
+        set dstintf "LAN-ZONE"
+        set srcaddr "all"
+        set dstaddr "INTERNAL_SUBNETS"
+        set action deny
+        set schedule "always"
+        set service "ALL"
+    next
+    edit 5
+        set name "Deny_WAN_to_DMZ"
+        set srcintf WAN-ZONE
+        set dstintf DMZ-ZONE                
+        set srcaddr "all"
+        set dstaddr "DMZ_SUBNET"
+        set action deny
+        set schedule "always"
+        set service "ALL"
+    next
+
+    edit 6
+        set name "Deny_WAN_to_SVFARM"
+        set srcintf WAN-ZONE
+        set dstintf SERVERFARM-ZONE
+        set srcaddr "all"
+        set dstaddr "SVFARM_SUBNET"
+        set action deny
+        set schedule "always"
+        set service "ALL"
+    next
+
+end
+
+
+
+
+
+
+
+

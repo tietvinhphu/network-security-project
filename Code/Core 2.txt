@@ -1,0 +1,422 @@
+Cấu hình Core 2
+------------------
+1/Cấu hình cơ bản
+
+enable
+configure terminal
+banner motd ^
++===========================+
+|  FPT JETKING - PENTAGUARD |
++===========================+
+^
+hostname CORE2
+no cdp run
+no ip domain-lookup
+line console 0
+logging synchronous
+exit
+
+#--- Tạo vlan quản trị
+
+configure terminal
+vlan 100
+name MGMT
+interface range e3/2-3
+sw mode acc
+sw acc vlan 100
+int vlan 100
+ip address 192.168.100.210 255.255.255.0
+no shutdown
+end
+copy run start
+------------------
+3/EtherChannel
+
+enable
+configure terminal
+
+interface range e0/2-3
+description UPLINK to Core1 [Po1]
+no switchport
+shutdown
+channel-group 1 mode active
+no shutdown
+exit
+interface port-channel 1
+no switchport
+ip add 10.1.1.2 255.255.255.252
+no shutdown
+exit
+
+interface range e1/0-1
+description UPLINK to SW2 [Po2]
+shutdown
+channel-group 2 mode active
+no shutdown
+interface port-channel 2
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allow vlan all
+exit
+
+interface range e1/2-3
+description UPLINK to SW1 [Po3]
+shutdown
+channel-group 3 mode active
+no shutdown
+interface port-channel 3
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allow vlan all
+
+end
+copy run start
+show etherchannel summary
+------------------
+3/VTP
+
+ena
+conf t
+vtp domain pentaguard.com
+vtp password 123
+vtp mode client
+end
+copy run start
+show vlan brief
+------------------
+4/Gán IP cho Vlan
+
+ena
+conf t
+
+ip routing
+int vlan 10
+ip add 192.168.10.2 255.255.255.0
+no shut
+exit
+int vlan 20
+ip add 192.168.20.2 255.255.255.0
+no shut
+exit
+int vlan 30
+ip add 192.168.30.2 255.255.255.0
+no shut
+exit
+int vlan 40
+ip add 192.168.40.2 255.255.255.0
+no shut
+exit
+int vlan 90 
+ip add 192.168.90.2 255.255.255.0
+no shut
+exit
+int vlan 99
+ip add 192.168.99.2 255.255.255.0
+no shut
+exit
+int vlan 110
+ip add 192.168.110.2 255.255.255.0
+no shut
+end
+copy run start
+------------------
+5/GLBP
+
+enable
+configure terminal
+interface Vlan10
+glbp 10 ip 192.168.10.254
+glbp 10 priority 100
+glbp 10 preempt
+glbp 10 load-balancing round-robin
+exit
+
+interface Vlan20
+glbp 20 ip 192.168.20.254
+glbp 20 priority 100
+glbp 20 preempt
+glbp 20 load-balancing round-robin
+exit
+
+interface Vlan30
+glbp 30 ip 192.168.30.254
+glbp 30 priority 100
+glbp 30 preempt
+glbp 30 load-balancing round-robin
+exit
+
+interface Vlan40
+glbp 40 ip 192.168.40.254
+glbp 40 priority 100
+glbp 40 preempt
+glbp 40 load-balancing round-robin
+exit
+
+interface Vlan90
+glbp 90 ip 192.168.90.254
+glbp 90 priority 110
+glbp 90 preempt
+glbp 90 load-balancing round-robin
+exit
+
+interface Vlan99
+glbp 99 ip 192.168.99.254
+glbp 99 priority 110
+glbp 99 preempt
+glbp 99 load-balancing round-robin
+exit
+
+interface Vlan110
+glbp 110 ip 192.168.110.254
+glbp 110 priority 110
+glbp 110 preempt
+glbp 110 load-balancing round-robin
+
+end
+copy run start
+------------------
+6/Spanning Tree
+
+enable
+configure terminal
+
+spanning-tree mode rapid-pvst
+spanning-tree vlan 90,99,110 priority 4096
+spanning-tree vlan 10,20,30,40,100 priority 28672
+end
+copy run start
+------------------
+7/OSPF
+enable
+configure terminal
+ip routing
+router ospf 1
+router-id 2.2.2.2
+passive-interface default
+no passive-interface Ethernet0/0
+no passive-interface Ethernet0/1
+no passive-interface Port-channel1
+
+network 10.1.1.0 0.0.0.3 area 0
+network 10.1.2.0 0.0.0.15 area 0
+network 10.1.3.0 0.0.0.15 area 0
+
+network 192.168.10.0 0.0.0.255 area 0  
+network 192.168.20.0 0.0.0.255 area 0  
+network 192.168.30.0 0.0.0.255 area 0 
+network 192.168.40.0 0.0.0.255 area 0  
+network 192.168.90.0 0.0.0.255 area 0 
+network 192.168.99.0 0.0.0.255 area 0  
+network 192.168.110.0 0.0.0.255 area 0 
+end
+copy run start
+show ip ospf neighbor
+show ip route
+------------------
+8/DHCP
+
+enable
+configure terminal
+service dhcp
+
+ip dhcp excluded-address 192.168.10.1 192.168.10.127
+ip dhcp excluded-address 192.168.10.254
+ip dhcp pool vlan10
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.254
+ dns-server 8.8.8.8
+exit
+
+ip dhcp excluded-address 192.168.20.1 192.168.20.127
+ip dhcp excluded-address 192.168.20.254
+ip dhcp pool Vlan20
+network 192.168.20.0 255.255.255.0
+default-router 192.168.20.254
+dns-server 8.8.8.8
+exit
+
+ip dhcp excluded-address 192.168.30.1 192.168.30.127
+ip dhcp excluded-address 192.168.30.254
+ip dhcp pool Vlan30
+network 192.168.30.0 255.255.255.0
+default-router 192.168.30.254
+dns-server 8.8.8.8
+exit
+
+ip dhcp excluded-address 192.168.40.1 192.168.40.127
+ip dhcp excluded-address 192.168.40.254
+ip dhcp pool Vlan40
+network 192.168.40.0 255.255.255.0
+default-router 192.168.40.254
+dns-server 8.8.8.8
+exit
+
+ip dhcp excluded-address 192.168.90.1 192.168.90.127
+ip dhcp excluded-address 192.168.90.254
+ip dhcp pool Vlan90
+network 192.168.90.0 255.255.255.0
+default-router 192.168.90.254
+dns-server 8.8.8.8
+exit
+
+ip dhcp excluded-address 192.168.99.1 192.168.99.127
+ip dhcp excluded-address 192.168.99.254
+ip dhcp pool Vlan99
+network 192.168.99.0 255.255.255.0
+default-router 192.168.99.254
+dns-server 8.8.8.8
+exit
+
+ip dhcp excluded-address 192.168.110.1 192.168.110.127
+ip dhcp excluded-address 192.168.110.254
+ip dhcp pool Vlan110
+network 192.168.110.0 255.255.255.0
+default-router 192.168.110.254
+dns-server 8.8.8.8
+exit
+
+end
+copy run start
+----------------
+10/Gán IP cho DSW2 lên FW2
+
+enable
+configure terminal
+int e0/0
+no sw
+shut
+ip add 10.1.2.4 255.255.255.240
+no shut
+exit
+
+int e0/1
+no sw
+shut
+ip add 10.1.3.4 255.255.255.240
+no shut
+end
+copy run start
+----------------
+11/Cấu hình Default Route trên CORE2
+
+ena
+conf t
+ip route 0.0.0.0 0.0.0.0 10.1.2.2
+end
+copy run start
+----------------
+12.Cấu hình SSH &  tạo ACL cho phép MGMT - SSH
+
+enable
+configure terminal
+service password-encryption
+enable secret @Penta123
+ip domain-name pentaguard.local
+username admin privilege 15 secret @Penta123
+crypto key generate rsa
+1024
+ip ssh version 2
+
+ip access-list standard VTY_SSH_FROM_MGMT_ONLY
+permit host 192.168.100.8 log
+deny any log
+exit
+line vty 0 4
+access-class VTY_SSH_FROM_MGMT_ONLY in
+transport input ssh
+login local
+end
+copy run start
+----------------
+12/Tạo ACLs cho VLANs
+#--- Tạo ACL cho phép VLAN90 quyền quản trị 
+
+ena
+conf t
+ip access-list extended ACL_FROM_VLAN90
+permit ip 192.168.90.0 0.0.0.255 any
+exit
+interface Vlan90
+ip access-group ACL_FROM_VLAN90 in
+exit
+
+#--- Tạo ACL cấm các VLAN User giao tiếp với nhau
+
+ena
+conf t
+ip access-list extended ACL_FROM_VLAN10
+permit udp any any eq bootps
+permit udp any any eq domain
+permit icmp any 192.168.90.0 0.0.0.255 echo-reply
+permit tcp any 192.168.90.0 0.0.0.255 established
+deny ip any 192.168.0.0 0.0.255.255 log
+permit ip any any
+interface Vlan10
+ip access-group ACL_FROM_VLAN10 in
+exit
+
+ip access-list extended ACL_FROM_VLAN20
+permit udp any any eq bootps
+permit udp any any eq domain
+permit icmp any 192.168.90.0 0.0.0.255 echo-reply
+permit tcp any 192.168.90.0 0.0.0.255 established
+deny ip any 192.168.0.0 0.0.255.255 log
+permit ip any any
+interface Vlan20
+ip access-group ACL_FROM_VLAN20 in
+exit
+
+ip access-list extended ACL_FROM_VLAN30
+permit udp any any eq bootps
+permit udp any any eq domain
+permit icmp any 192.168.90.0 0.0.0.255 echo-reply
+permit tcp any 192.168.90.0 0.0.0.255 established
+deny ip any 192.168.0.0 0.0.255.255 log
+permit ip any any
+interface Vlan30
+ip access-group ACL_FROM_VLAN30 in
+exit
+
+ip access-list extended ACL_FROM_VLAN40
+permit udp any any eq bootps
+permit udp any any eq domain
+permit icmp any 192.168.90.0 0.0.0.255 echo-reply
+permit tcp any 192.168.90.0 0.0.0.255 established
+deny ip any 192.168.0.0 0.0.255.255 log
+permit ip any any
+interface Vlan40
+ip access-group ACL_FROM_VLAN40 in
+exit
+
+ip access-list extended ACL_FROM_VLAN99
+permit udp any any eq bootps
+permit udp any any eq domain
+permit icmp any 192.168.90.0 0.0.0.255 echo-reply
+permit tcp any 192.168.90.0 0.0.0.255 established
+deny ip any 192.168.0.0 0.0.255.255 log
+permit ip any any
+interface Vlan99
+ip access-group ACL_FROM_VLAN99 in
+exit
+
+ip access-list extended ACL_FROM_VLAN110
+permit udp any any eq bootps
+permit udp any any eq domain
+permit icmp any 192.168.90.0 0.0.0.255 echo-reply
+permit tcp any 192.168.90.0 0.0.0.255 established
+deny ip any 192.168.0.0 0.0.255.255 log
+permit ip any any
+interface Vlan110
+ip access-group ACL_FROM_VLAN110 in
+end
+copy run start
+----------------
+13/Configure HA
+
+Add default route to FW1
+
+enable
+configure terminal
+ip route 0.0.0.0 0.0.0.0 10.1.3.1
+end
+copy run start

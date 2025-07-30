@@ -1,0 +1,136 @@
+Cấu hình Switch 1
+------------------
+1/Cấu hình cơ bản
+
+enable
+configure terminal
+banner motd ^
++===========================+
+|  FPT JETKING - PENTAGUARD |
++===========================+
+^
+hostname SW1
+no cdp run
+no ip domain-lookup
+line console 0
+logging synchronous
+exit
+
+#--- Tạo vlan quản trị
+
+enable
+configure terminal
+
+vlan 100
+name MGMT
+interface range e3/2-3
+sw mode acc
+sw acc vlan 100
+int vlan 100
+ip address 192.168.100.230 255.255.255.0
+no shutdown
+end
+copy run start
+------------------
+2/EtherChannel
+
+enable
+configure terminal
+interface range e0/0-1
+description UPLINK to Core1 [Po2]
+shutdown
+channel-group 2 mode active
+no shutdown
+interface port-channel 2
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allow vlan all
+exit
+
+interface range e0/2-3
+description UPLINK to Core2 [Po3]
+shutdown
+channel-group 3 mode active
+no shutdown
+interface port-channel 3
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allow vlan all
+end
+copy run start
+show etherchannel summary
+------------------
+3/VTP
+
+enable
+configure terminal
+vtp domain pentaguard.com
+vtp password 123
+vtp mode client
+end
+copy run start
+show vlan brief
+------------------
+4/GÁN PORT VLAN
+
+enable
+configure terminal
+int e1/0
+switchport mode access
+switchport access vlan 10
+no shut
+exit
+
+int e1/1
+switchport mode access
+switchport access vlan 20
+no shut
+exit
+
+int e1/2
+switchport mode access
+switchport access vlan 30
+no shut
+exit
+
+int e1/3
+switchport mode access
+switchport access vlan 40
+no shut
+end
+copy run start
+------------------
+5/Spanning Tree
+
+enable
+configure terminal
+
+spanning-tree mode rapid-pvst
+end
+copy run start
+----------------
+6/Cấu hình SSH &  tạo ACL cho phép MGMT - SSH
+
+ena
+conf t
+
+service password-encryption
+enable secret @Penta123
+ip domain-name pentaguard.local
+username admin privilege 15 secret @Penta123
+crypto key generate rsa
+1024
+ip ssh version 2
+
+ip access-list standard VTY_SSH_FROM_MGMT_ONLY
+permit host 192.168.100.8 log
+deny any log
+exit
+line vty 0 4
+access-class VTY_SSH_FROM_MGMT_ONLY in
+transport input ssh
+login local
+end
+copy run start
+
+
