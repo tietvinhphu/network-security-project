@@ -36,13 +36,13 @@ Dự án nghiên cứu và áp dụng các công nghệ tiên tiến để xây 
 
 Dưới đây là sơ đồ mạng logical của hệ thống được đề xuất:
 
-![Sơ đồ mạng Logical](Picture2.png)
+![Sơ đồ mạng Logical](images/Picture2.png)
 
 ## Sơ đồ Mạng Vật lý
 
 Và đây là sơ đồ mạng vật lý minh họa cách các thiết bị được kết nối:
 
-![Sơ đồ mạng Vật lý](Picture3.png)
+![Sơ đồ mạng Vật lý](images/Picture3.png)
 
 ## Quy trình Triển khai Dự án
 
