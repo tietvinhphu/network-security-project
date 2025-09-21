@@ -4,6 +4,8 @@
 
 Dự án này tập trung vào việc thiết kế và triển khai một hạ tầng mạng nội bộ an toàn và hiệu quả cho công ty PVS, tuân thủ các tiêu chuẩn an toàn thông tin hiện hành. Mục tiêu là giải quyết các vấn đề hiện tại về bảo mật và hiệu suất mạng mà doanh nghiệp đang gặp phải, đồng thời đáp ứng các yêu cầu về khả năng mở rộng và độ tin cậy.
 
+**Tham khảo chi tiết:** [Thiết kế và Triển khai Hạ tầng Mạng Nội bộ cho Công ty PVS theo Tiêu chuẩn An toàn Thông tin](https://jetking.fpt.edu.vn/thiet-ke-va-trien-khai-ha-tang-mang-noi-bo-cho-cong-ty-pvs-theo-tieu-chuan-toan-thong-tin/)
+
 ## Tổng quan Doanh nghiệp (Công ty PVS)
 
 **Hiện trạng và Vấn đề:**
